@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smart_attendance
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/smart_attendance
+      JWT_SECRET: replace-with-secret
+      FRONTEND_URL: http://localhost:3000
+      WORK_START_TIME: '09:00'
+      GEOFENCE_LAT: '0'
+      GEOFENCE_LON: '0'
+      GEOFENCE_RADIUS_METERS: '1000'
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/usr/src/app
+
+volumes:
+  db_data:
